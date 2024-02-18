@@ -5,6 +5,7 @@ import com.gdsc.vridge.dto.SynthesizeVoicesDto;
 import com.gdsc.vridge.dto.response.VoiceListResponseDto;
 import com.gdsc.vridge.dto.uploadRecordingDto;
 import com.google.cloud.firestore.Firestore;
+import com.google.firebase.cloud.FirestoreClient;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -17,16 +18,7 @@ import org.springframework.stereotype.Service;
 public class VoiceService {
     private static final Logger logger = LoggerFactory.getLogger(VoiceService.class);
 
-    private final Firestore firestore;
-
-    public List<String> getVoiceList(String uid) {
-
-        //////////////
-        // Firestore DB에서 사용자 정보를 조회하고, 그 사용자에 저장된 목소리 ID 리스트 가져오기
-        //////////////
-
-        return null;
-    }
+    private final Firestore firestore = FirestoreClient.getFirestore();
 
     public String uploadRecording(uploadRecordingDto uploadRecordingDto) {
 
@@ -50,7 +42,7 @@ public class VoiceService {
             String newVoiceId = UUID.randomUUID().toString().replace("-", "");
 
             //////////////
-            // Ai 서버의 목소리 합성 함수 실행
+            // AI 서버의 목소리 합성 함수 실행
             //////////////
 
             return newVoiceId;
@@ -69,12 +61,10 @@ public class VoiceService {
             logger.info("uid: {}", createTTSDto.getUid());
             logger.info("voidId: {}", createTTSDto.getVoiceId());
             logger.info("text: {}", createTTSDto.getText());
-
             return true;
         } catch (Exception e) {
             logger.error("TTS 생성 중 오류 발생: {}", e.getMessage());
             return false;
         }
     }
-
 }

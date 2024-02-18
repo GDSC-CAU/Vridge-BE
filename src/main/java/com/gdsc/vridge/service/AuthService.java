@@ -6,6 +6,7 @@ import com.google.cloud.firestore.Firestore;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
+import com.google.firebase.cloud.FirestoreClient;
 import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +21,7 @@ public class AuthService {
     private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
 
     private final FirebaseAuth firebaseAuth;
-    private final Firestore firestore;
+    private final Firestore firestore = FirestoreClient.getFirestore();
 
     public boolean loginUser(String firebaseAuthToken) {
         try {

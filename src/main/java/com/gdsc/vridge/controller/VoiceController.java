@@ -24,15 +24,6 @@ public class VoiceController {
 
     private final VoiceService voiceService;
 
-    @GetMapping("/list")
-    public ResponseEntity<VoiceListResponseDto> list(@RequestBody VoiceListDto voiceListDto) {
-        List<String> voiceList = voiceService.getVoiceList(voiceListDto.getUid());
-        VoiceListResponseDto voiceListResponseDto = VoiceListResponseDto.builder()
-            .voiceList(voiceList)
-            .build();
-        return ResponseEntity.ok(voiceListResponseDto);
-    }
-
     @PostMapping("/upload")
     public ResponseEntity<VoiceIdResponseDto> upload(@RequestBody uploadRecordingDto uploadRecordingDto) {
         String voiceId = voiceService.uploadRecording(uploadRecordingDto);
@@ -57,6 +48,10 @@ public class VoiceController {
         BooleanResponseDto booleanResponseDto = BooleanResponseDto.builder()
             .success(createResult)
             .build();
-        return ResponseEntity.ok(booleanResponseDto);
+        if (createResult) {
+            return ResponseEntity.ok(booleanResponseDto);
+        } else {
+            return ResponseEntity.badRequest().body(booleanResponseDto);
+        }
     }
 }

@@ -3,6 +3,7 @@ package com.gdsc.vridge.controller;
 import com.gdsc.vridge.dto.response.BooleanResponseDto;
 import com.gdsc.vridge.service.AuthService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,6 +23,10 @@ public class AuthController {
         BooleanResponseDto booleanResponseDto = BooleanResponseDto.builder()
             .success(loginResult)
             .build();
-        return ResponseEntity.ok(booleanResponseDto);
+        if (loginResult) {
+            return ResponseEntity.ok(booleanResponseDto);
+        } else {
+            return ResponseEntity.badRequest().body(booleanResponseDto);
+        }
     }
 }
