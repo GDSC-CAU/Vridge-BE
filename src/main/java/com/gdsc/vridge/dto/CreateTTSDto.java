@@ -5,8 +5,10 @@ import lombok.Data;
 @Data
 public class CreateTTSDto {
 
-    private String uid;
-    private String voiceId;
     private String text;
+    private String ttsId;
+    private String uid;
+    private String vid;
+    private int pitch;
 
 }

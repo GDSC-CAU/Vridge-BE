@@ -6,6 +6,7 @@ import lombok.Data;
 public class uploadRecordingDto {
 
     private String uid;
+    private String vid;
     private String path;
 
 }

@@ -29,4 +29,17 @@ public class AuthController {
             return ResponseEntity.badRequest().body(booleanResponseDto);
         }
     }
+
+    @PostMapping("/delete")
+    public ResponseEntity<BooleanResponseDto> delete(@RequestBody String uid) {
+        boolean deleteResult = authService.deleteUser(uid);
+        BooleanResponseDto booleanResponseDto = BooleanResponseDto.builder()
+            .success(deleteResult)
+            .build();
+        if (deleteResult) {
+            return ResponseEntity.ok(booleanResponseDto);
+        } else {
+            return ResponseEntity.badRequest().body(booleanResponseDto);
+        }
+    }
 }

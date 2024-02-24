@@ -2,11 +2,19 @@ package com.gdsc.vridge.service;
 
 import com.gdsc.vridge.dto.CreateTTSDto;
 import com.gdsc.vridge.dto.SynthesizeVoicesDto;
-import com.gdsc.vridge.dto.response.VoiceListResponseDto;
 import com.gdsc.vridge.dto.uploadRecordingDto;
 import com.google.cloud.firestore.Firestore;
 import com.google.firebase.cloud.FirestoreClient;
-import java.util.List;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.net.http.HttpRequest;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -18,53 +26,124 @@ import org.springframework.stereotype.Service;
 public class VoiceService {
     private static final Logger logger = LoggerFactory.getLogger(VoiceService.class);
 
-    private final Firestore firestore = FirestoreClient.getFirestore();
+    public Boolean uploadRecording(uploadRecordingDto uploadRecordingDto) {
 
-    public String uploadRecording(uploadRecordingDto uploadRecordingDto) {
+        String uid = uploadRecordingDto.getUid();
+        String vid = uploadRecordingDto.getVid();
 
-        // 새 목소리 ID 생성
-        String voiceId = UUID.randomUUID().toString().replace("-", "");
-
-        ///////////
-        // Firebase Storage 내부에 ID(voidId)값으로 폴더 만들고, 업로드된 WAV 파일 저장
         // AI 서버의 목소리 생성 함수 실행
-        //////////
+        HttpURLConnection connection = null;
+        try {
+            String baseURL = "http://34.133.49.11:5000/train?";
 
-        return voiceId;
+            String param = String.format("uid1=%s&vid1=%s",
+                uid, vid);
+            String fullURL = baseURL + "?" + param;
+
+            URL url = new URL(fullURL);
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+
+            connection.connect();
+
+            // HTTP 응답 코드 확인
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
+        }
     }
 
+    // http://localhost:5000/merge?uid1=123&vid1=456&vid2=789&vid3=1011
     public String synthesizeVoices(SynthesizeVoicesDto synthesizeVoicesDto) {
+
+        String uid = synthesizeVoicesDto.getUid();
+        String[] vids = synthesizeVoicesDto.getVids();
+        String vid_1 = vids[0];
+        String vid_2 = vids[1];
+
+        // 새 목소리 ID 생성
+        String newVid = UUID.randomUUID().toString().replace("-", "");
+
+        // AI 서버의 목소리 합성 함수 실행
+        HttpURLConnection connection = null;
         try {
-            String uid = synthesizeVoicesDto.getUid();
-            String[] voiceIds = synthesizeVoicesDto.getVoiceIds();
+            String baseURL = "http://34.133.49.11:5000/merge?";
 
-            // 새 목소리 ID 생성
-            String newVoiceId = UUID.randomUUID().toString().replace("-", "");
+            String param = String.format("uid1=%s&vid1=%s&vid2=%s&vid3=%s",
+                uid, vid_1, vid_2, newVid);
+            String fullURL = baseURL + "?" + param;
 
-            //////////////
-            // AI 서버의 목소리 합성 함수 실행
-            //////////////
+            URL url = new URL(fullURL);
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
 
-            return newVoiceId;
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to synthesize voices", e);
+            connection.connect();
+
+            // HTTP 응답 코드 확인
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                return newVid;
+            } else {
+                return null;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
         }
     }
 
     public boolean createTTS(CreateTTSDto createTTSDto) {
-        try {
-            //////////////
-            // AI 서버의 TTS 함수 실행
-            /////////////
 
-            logger.info("TTS 생성 요청");
-            logger.info("uid: {}", createTTSDto.getUid());
-            logger.info("voidId: {}", createTTSDto.getVoiceId());
-            logger.info("text: {}", createTTSDto.getText());
-            return true;
-        } catch (Exception e) {
-            logger.error("TTS 생성 중 오류 발생: {}", e.getMessage());
+        String text = createTTSDto.getText();
+        String ttsId = createTTSDto.getTtsId();
+        String uid = createTTSDto.getUid();
+        String vid = createTTSDto.getVid();
+        int pitch = createTTSDto.getPitch();
+
+        // AI 서버의 TTS 함수 실행
+        HttpURLConnection connection = null;
+        try {
+            String baseURL = "http://34.133.49.11:5000/tts?";
+            String tts = URLEncoder.encode(text, "UTF-8");
+
+            String param = String.format("tts=%s&ttsid=%s&uid=%s&vid=%s&pitch=%d",
+                tts, ttsId, uid, vid, pitch);
+            String fullURL = baseURL + "?" + param;
+
+            URL url = new URL(fullURL);
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+
+            connection.connect();
+
+            // HTTP 응답 코드 확인
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
             return false;
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
         }
     }
 }

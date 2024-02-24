@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ClassPathResource;
 
 @Configuration
 public class FirebaseConfig {
@@ -19,10 +20,11 @@ public class FirebaseConfig {
     @Bean
     public FirebaseApp firebaseApp() throws IOException {
         log.info("Initializing Firebase.");
-        FileInputStream serviceAccount = new FileInputStream("src/main/resources/serviceAccountKey.json");
+//        FileInputStream serviceAccount = new FileInputStream("src/main/resources/serviceAccountKey.json");
+        ClassPathResource resource = new ClassPathResource("serviceAccountKey.json");
 
         FirebaseOptions options = new FirebaseOptions.Builder()
-            .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+            .setCredentials(GoogleCredentials.fromStream(resource.getInputStream()))
             .build();
 
         FirebaseApp app = FirebaseApp.initializeApp(options);

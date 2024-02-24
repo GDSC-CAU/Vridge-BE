@@ -7,6 +7,6 @@ import lombok.Data;
 public class SynthesizeVoicesDto {
 
     private String uid;
-    private String[] voiceIds;
+    private String[] vids;
 
 }
