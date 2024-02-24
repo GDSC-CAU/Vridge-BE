@@ -1,17 +1,13 @@
 package com.gdsc.vridge.controller;
 
 import com.gdsc.vridge.dto.SynthesizeVoicesDto;
-import com.gdsc.vridge.dto.VoiceListDto;
 import com.gdsc.vridge.dto.response.BooleanResponseDto;
 import com.gdsc.vridge.dto.CreateTTSDto;
 import com.gdsc.vridge.dto.response.VoiceIdResponseDto;
-import com.gdsc.vridge.dto.response.VoiceListResponseDto;
 import com.gdsc.vridge.dto.uploadRecordingDto;
 import com.gdsc.vridge.service.VoiceService;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,39 +20,45 @@ public class VoiceController {
 
     private final VoiceService voiceService;
 
-    @GetMapping("/list")
-    public ResponseEntity<VoiceListResponseDto> list(@RequestBody VoiceListDto voiceListDto) {
-        List<String> voiceList = voiceService.getVoiceList(voiceListDto.getUid());
-        VoiceListResponseDto voiceListResponseDto = VoiceListResponseDto.builder()
-            .voiceList(voiceList)
-            .build();
-        return ResponseEntity.ok(voiceListResponseDto);
-    }
-
+//    http://localhost:8080/api/v1/voice/upload
     @PostMapping("/upload")
-    public ResponseEntity<VoiceIdResponseDto> upload(@RequestBody uploadRecordingDto uploadRecordingDto) {
-        String voiceId = voiceService.uploadRecording(uploadRecordingDto);
-        VoiceIdResponseDto voiceIdResponseDto = VoiceIdResponseDto.builder()
-            .voiceId(voiceId)
+    public ResponseEntity<BooleanResponseDto> upload(@RequestBody uploadRecordingDto uploadRecordingDto) {
+        boolean uploadResult = voiceService.uploadRecording(uploadRecordingDto);
+        BooleanResponseDto booleanResponseDto = BooleanResponseDto.builder()
+            .success(uploadResult)
             .build();
-        return ResponseEntity.ok(voiceIdResponseDto);
+        if (uploadResult) {
+            return ResponseEntity.ok(booleanResponseDto);
+        } else {
+            return ResponseEntity.badRequest().body(booleanResponseDto);
+        }
     }
 
+//    http://localhost:8080/api/v1/voice/synthesize
     @PostMapping("/synthesize")
     public ResponseEntity<VoiceIdResponseDto> synthesize(@RequestBody SynthesizeVoicesDto synthesizeVoicesDto) {
         String newVoiceId = voiceService.synthesizeVoices(synthesizeVoicesDto);
         VoiceIdResponseDto voiceIdResponseDto = VoiceIdResponseDto.builder()
-            .voiceId(newVoiceId)
+            .vid(newVoiceId)
             .build();
-        return ResponseEntity.ok(voiceIdResponseDto);
+        if (newVoiceId != null) {
+            return ResponseEntity.ok(voiceIdResponseDto);
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
+//    http://localhost:8080/api/v1/voice/create
     @PostMapping("/create")
     public ResponseEntity<BooleanResponseDto> create(@RequestBody CreateTTSDto createTTSDto) {
         boolean createResult = voiceService.createTTS(createTTSDto);
         BooleanResponseDto booleanResponseDto = BooleanResponseDto.builder()
             .success(createResult)
             .build();
-        return ResponseEntity.ok(booleanResponseDto);
+        if (createResult) {
+            return ResponseEntity.ok(booleanResponseDto);
+        } else {
+            return ResponseEntity.badRequest().body(booleanResponseDto);
+        }
     }
 }

@@ -7,6 +7,6 @@ import lombok.Data;
 @Builder
 public class VoiceIdResponseDto {
 
-    private String voiceId;
+    private String vid;
 
 }
