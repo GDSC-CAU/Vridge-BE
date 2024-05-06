@@ -5,10 +5,10 @@ import com.gdsc.vridge.entity.TTSEntity;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.DocumentReference;
-import com.google.cloud.firestore.FieldValue;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
+import com.google.firebase.cloud.FirestoreClient;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -27,13 +27,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class TTSService {
 
-    private Firestore firestore;
-
-    @Autowired
-    public TTSService(Firestore firestore) {
-        this.firestore = firestore;
-    }
-
     public ResponseEntity<TTSEntity> createTTS(TTSDto ttsDto) {
         String uid = ttsDto.getUid();
         String vid = ttsDto.getVid();
@@ -45,8 +38,10 @@ public class TTSService {
         BufferedReader br = null;
         StringBuilder sb = null;
 
+        Firestore db = FirestoreClient.getFirestore();
+
         try {
-            DocumentReference userRef = firestore.collection("users").document(uid);
+            DocumentReference userRef = db.collection("users").document(uid);
             DocumentReference voiceRef = userRef.collection("voice").document(vid);
 
             TTSEntity tts = new TTSEntity(tid, text, timestamp, false);
@@ -98,8 +93,10 @@ public class TTSService {
     }
 
     public ResponseEntity<List<TTSEntity>> getTTSList(String uid, String vid) {
+        Firestore db = FirestoreClient.getFirestore();
+
         try {
-            CollectionReference ttsCollectionRef = firestore.collection("users").document(uid)
+            CollectionReference ttsCollectionRef = db.collection("users").document(uid)
                 .collection("voice").document(vid)
                 .collection("tts");
 

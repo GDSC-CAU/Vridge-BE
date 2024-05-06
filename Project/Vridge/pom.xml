@@ -61,11 +61,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.mariadb.jdbc</groupId>
-			<artifactId>mariadb-java-client</artifactId>
-		</dependency>
-
-		<dependency>
 			<groupId>com.google.firebase</groupId>
 			<artifactId>firebase-admin</artifactId>
 			<version>9.2.0</version>

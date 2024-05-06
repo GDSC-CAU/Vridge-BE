@@ -1,6 +1,7 @@
 package com.gdsc.vridge.config;
 
 import com.google.auth.oauth2.GoogleCredentials;
+import com.google.cloud.firestore.Firestore;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.auth.FirebaseAuth;
@@ -18,7 +19,7 @@ public class FirebaseConfig {
 
     @Bean
     public FirebaseApp firebaseApp() throws IOException {
-        FileInputStream serviceAccount = new FileInputStream("/path/to/serviceAccountKey.json");
+        FileInputStream serviceAccount = new FileInputStream("src/main/resources/serviceAccountKey.json");
 
         FirebaseOptions options = FirebaseOptions.builder()
             .setCredentials(GoogleCredentials.fromStream(serviceAccount))
@@ -31,5 +32,6 @@ public class FirebaseConfig {
     public FirebaseAuth firebaseAuth() throws IOException {
         return FirebaseAuth.getInstance(firebaseApp());
     }
+
 
 }

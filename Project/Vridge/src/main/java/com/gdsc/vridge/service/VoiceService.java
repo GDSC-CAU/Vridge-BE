@@ -47,16 +47,6 @@ public class VoiceService {
 
     private StorageClient storageClient;
 
-    @Autowired
-    public VoiceService(Firestore firestore) {
-        this.firestore = firestore;
-    }
-
-    @Autowired
-    public VoiceService(StorageClient storageClient) {
-        this.storageClient = storageClient;
-    }
-
     public ResponseEntity<List<VoiceEntity>> getVoiceList(String uid) {
         try {
             CollectionReference voiceCollectionRef = firestore.collection("users").document(uid).collection("voice");

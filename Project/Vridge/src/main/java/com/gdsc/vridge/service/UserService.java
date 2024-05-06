@@ -27,39 +27,21 @@ public class UserService {
     private String firebaseBucket;
 
     private FirebaseAuth firebaseAuth;
-    private Firestore firestore;
+
     private StorageClient storageClient;
-    private Storage storage;
 
-    @Autowired
-    public UserService(FirebaseAuth firebaseAuth) {
-        this.firebaseAuth = firebaseAuth;
-    }
-
-    @Autowired
-    public UserService(Firestore firestore) {
-        this.firestore = firestore;
-    }
-
-    @Autowired
-    public UserService(StorageClient storageClient) {
-        this.storageClient = storageClient;
-    }
-
-    @Autowired
-    public UserService(Storage storage) {
-        this.storage = storage;
-    }
 
     public ResponseEntity<Void> loginUser(UserDto.Login login) {
         String token = login.getToken();
         String fcmToken = login.getFcmToken();
 
+        Firestore db = FirestoreClient.getFirestore();
+
         try {
             FirebaseToken decodedToken = firebaseAuth.verifyIdToken(token);
             String uid = decodedToken.getUid();
 
-            DocumentReference userRef = firestore.collection("users").document(uid);
+            DocumentReference userRef = db.collection("users").document(uid);
             DocumentSnapshot userSnapshot = userRef.get().get();
 
             if (userSnapshot.exists()) {
@@ -82,8 +64,10 @@ public class UserService {
         String uid = fcmToken.getUid();
         String newFcmToken = fcmToken.getFcmToken();
 
+        Firestore db = FirestoreClient.getFirestore();
+
         try {
-            DocumentReference userRef = firestore.collection("users").document(uid);
+            DocumentReference userRef = db.collection("users").document(uid);
             DocumentSnapshot userSnapshot = userRef.get().get();
 
             if (userSnapshot.exists()) {
@@ -99,8 +83,11 @@ public class UserService {
     }
 
     public ResponseEntity<Void> deleteUser(String uid) {
+
+        Firestore db = FirestoreClient.getFirestore();
+
         try {
-            DocumentReference userRef = firestore.collection("users").document(uid);
+            DocumentReference userRef = db.collection("users").document(uid);
             DocumentSnapshot userSnapshot = userRef.get().get();
 
             if (userSnapshot.exists()) {
@@ -124,8 +111,11 @@ public class UserService {
     }
 
     public ResponseEntity<UserInfo> getUser(String uid) {
+
+        Firestore db = FirestoreClient.getFirestore();
+
         try {
-            DocumentReference userRef = firestore.collection("users").document(uid);
+            DocumentReference userRef = db.collection("users").document(uid);
             DocumentSnapshot userSnapshot = userRef.get().get();
 
             if (userSnapshot.exists()) {
