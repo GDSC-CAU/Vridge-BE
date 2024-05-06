@@ -13,6 +13,8 @@ import com.google.cloud.firestore.FieldValue;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
+import com.google.cloud.storage.Blob;
+import com.google.firebase.cloud.StorageClient;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
@@ -30,6 +32,7 @@ import java.util.concurrent.ExecutionException;
 import org.apache.tomcat.util.json.JSONParser;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -37,11 +40,21 @@ import org.springframework.stereotype.Service;
 @Service
 public class VoiceService {
 
+    @Value("${app.firebase-bucket}")
+    private String firebaseBucket;
+
     private Firestore firestore;
+
+    private StorageClient storageClient;
 
     @Autowired
     public VoiceService(Firestore firestore) {
         this.firestore = firestore;
+    }
+
+    @Autowired
+    public VoiceService(StorageClient storageClient) {
+        this.storageClient = storageClient;
     }
 
     public ResponseEntity<List<VoiceEntity>> getVoiceList(String uid) {
@@ -106,8 +119,18 @@ public class VoiceService {
             DocumentSnapshot userSnapshot = userRef.get().get();
 
             if (userSnapshot.exists()) {
+                String recordVid = userSnapshot.getString("recordVid");
+
                 userRef.update("recordVid", "");
                 userRef.update("recordIndex", 0);
+
+                Iterable<Blob> blobs = storageClient.bucket(firebaseBucket).list().getValues();
+                for (Blob blob : blobs) {
+                    if (blob.getName().startsWith(uid + "/" + recordVid + "/")) {
+                        blob.delete();
+                    }
+                }
+
                 return ResponseEntity.ok().build();
             } else {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();

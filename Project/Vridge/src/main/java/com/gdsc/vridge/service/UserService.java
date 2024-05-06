@@ -106,7 +106,7 @@ public class UserService {
             if (userSnapshot.exists()) {
                 userRef.delete();
 
-                Iterable<Blob> blobs = storageClient.bucket().list().getValues();
+                Iterable<Blob> blobs = storageClient.bucket(firebaseBucket).list().getValues();
                 for (Blob blob : blobs) {
                     if (blob.getName().startsWith(uid + "/")) {
                         blob.delete();
