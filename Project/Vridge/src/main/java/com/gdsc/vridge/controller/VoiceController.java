@@ -4,7 +4,6 @@ import com.gdsc.vridge.dto.VoiceDto;
 import com.gdsc.vridge.entity.VoiceEntity;
 import com.gdsc.vridge.service.VoiceService;
 import java.util.List;
-import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

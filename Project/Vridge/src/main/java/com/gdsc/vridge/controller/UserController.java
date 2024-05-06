@@ -2,7 +2,6 @@ package com.gdsc.vridge.controller;
 
 import com.gdsc.vridge.dto.UserDto;
 import com.gdsc.vridge.dto.UserDto.UserInfo;
-import com.gdsc.vridge.entity.UserEntity;
 import com.gdsc.vridge.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
